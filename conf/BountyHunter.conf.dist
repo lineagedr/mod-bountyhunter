@@ -1,0 +1,30 @@
+#
+# Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+#
+
+[worldserver]
+
+########################################
+# Bounty Hunter Module configuration
+########################################
+#
+#    BountyHunter.Enable
+#        Description: Enables the bounty hunter module
+#        Default:     0 - Disabled
+#                     1 - Enabled
+#
+#    BountyHunter.TokenId
+#        Description: Sets the Token itemId
+#        Default:     0 - No Token
+#
+#
+#    BountyHunter.MaxGoldAmount
+#    BountyHunter.MaxHonorAmount
+#    BountyHunter.MaxTokenAmount
+#        Description: Sets the max amount that can be placed
+
+BountyHunter.Enable = 1
+BountyHunter.TokenId = 6265
+BountyHunter.MaxTokenAmount = 10
+BountyHunter.MaxGoldAmount  = 1000
+BountyHunter.MaxHonorAmount = 75000
