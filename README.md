@@ -6,7 +6,7 @@
 #### Features:
 - Change you faction in bg for balance faction.
 
-#### Config option (CFBG.conf.dist)
+#### Config option (BountyHunter.conf.dist)
 ```ini
 ########################################
 # Bounty Hunter Module configuration
@@ -37,7 +37,7 @@ BountyHunter.MaxHonorAmount = 75000
 ### How to install
 1. Simply place the module under the `modules` folder of your AzerothCore source folder.
 2. Re-run cmake and launch a clean build of AzerothCore
-3. Run the SQL file in sql folder.
+3. Run the SQL files in the sql folders.
 4. Done :)
 
 ### Edit module configuration (optional)
