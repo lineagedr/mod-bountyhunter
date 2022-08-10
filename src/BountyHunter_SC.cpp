@@ -4,7 +4,7 @@
 *                              *
 *    Created on: 14/08/2021    *
 *    Updated on: 15/08/2021    *
-/*******************************/
+********************************/
 
 #include "BountyHunter.h"
 #include "ScriptedGossip.h"
@@ -21,7 +21,7 @@ public:
 
         if (sBountyHunter->FindBounty(bounty->GetGUID()))
         {
-            switch(sBountyHunter->GetBountyPriceType(bounty->GetGUID()))
+            switch (sBountyHunter->GetBountyPriceType(bounty->GetGUID()))
             {
             case BountyPriceType::GOLD:
                 killer->ModifyMoney(sBountyHunter->GetBountyPriceAmount(bounty->GetGUID()) * 10000);
@@ -31,6 +31,8 @@ public:
                 break;
             case BountyPriceType::TOKENS:
                 killer->AddItem(sBountyHunter->GetTokenId(), sBountyHunter->GetBountyPriceAmount(bounty->GetGUID()));
+                break;
+            default:
                 break;
             }
             sBountyHunter->Announce(bounty, BountyAnnounceType::TYPE_COLLECTED, killer->GetName());
@@ -78,8 +80,8 @@ public:
             text.tokens += std::to_string(sBountyHunter->GetBountyGossipData()[player->GetGUID()].priceAmount);
             break;
         default:
-            text.gold += notSelected;
-            text.honor += notSelected;
+            text.gold   += notSelected;
+            text.honor  += notSelected;
             text.tokens += notSelected;
             break;
         }
@@ -87,7 +89,7 @@ public:
 
     inline void GossipForPlaceBounty(Player* player, Creature* creature)
     {
-        BountyGossipSelectText text = {"|TInterface/ICONS/achievement_bg_killingblow_berserker:25:25|tPlayer's Name ", "|TInterface/ICONS/inv_misc_coin_02:25:25|tGold", "|TInterface/ICONS/ability_dualwield:25:25|tHonor", ""};
+        BountyGossipSelectText text = { "|TInterface/ICONS/achievement_bg_killingblow_berserker:25:25|tPlayer's Name ", "|TInterface/ICONS/inv_misc_coin_02:25:25|tGold", "|TInterface/ICONS/ability_dualwield:25:25|tHonor", "" };
         text.tokens = sBountyHunter->GetTokenIcon().c_str();
         text.tokens += sBountyHunter->GetTokenName().c_str();
 
@@ -127,7 +129,7 @@ public:
         switch (action)
         {
         case static_cast<uint8>(BountyHunter_Menu::GOSSIP_PLACE_BOUNTY):
-            GossipForPlaceBounty(player, creature);   
+            GossipForPlaceBounty(player, creature);
             break;
         case static_cast<uint8>(BountyHunter_Menu::GOSSIP_LIST_BOUNTY):
             sBountyHunter->ListBounties(player, creature);
@@ -145,8 +147,10 @@ public:
         case static_cast<uint8>(BountyHunter_Menu::GOSSIP_EXIT):
             CloseGossipMenuFor(player);
             break;
+        default:
+            break;
         }
-        
+
         return true;
     }
 
@@ -159,7 +163,7 @@ public:
 
         if (!Validate(player, action, code))
             return false;
-      
+
         switch (action)
         {
         case static_cast<uint8>(BountyHunter_Menu::GOSSIP_BOUNTY_NAME):
@@ -167,6 +171,8 @@ public:
         case static_cast<uint8>(BountyHunter_Menu::GOSSIP_HONOR):
         case static_cast<uint8>(BountyHunter_Menu::GOSSIP_TOKENS):
             OnGossipSelect(player, creature, sender, static_cast<uint8>(BountyHunter_Menu::GOSSIP_PLACE_BOUNTY));
+            break;
+        default:
             break;
         }
 
@@ -180,7 +186,7 @@ private:
 
         switch (action)
         {
-         case BountyPriceType::GOLD:
+        case BountyPriceType::GOLD:
             if (!player->HasEnoughMoney(amount * 10000))
             {
                 player->GetSession()->SendAreaTriggerMessage("|cffff0000You don't have enough gold.|r");
@@ -204,6 +210,8 @@ private:
                 CloseGossipMenuFor(player);
                 return false;
             }
+            break;
+        default:
             break;
         }
         return true;
@@ -248,7 +256,7 @@ private:
                     CloseGossipMenuFor(player);
                     return false;
                 }
-                sBountyHunter->AddGossipInfo(player->GetGUID(), {"", BountyPriceType::GOLD, amount});
+                sBountyHunter->AddGossipInfo(player->GetGUID(), { "", BountyPriceType::GOLD, amount });
                 break;
             case static_cast<uint8>(BountyHunter_Menu::GOSSIP_HONOR):
                 if (amount > sBountyHunter->GetHonorMaxAmount())
@@ -257,7 +265,7 @@ private:
                     CloseGossipMenuFor(player);
                     return false;
                 }
-                sBountyHunter->AddGossipInfo(player->GetGUID(), {"", BountyPriceType::HONOR, amount});
+                sBountyHunter->AddGossipInfo(player->GetGUID(), { "", BountyPriceType::HONOR, amount });
                 break;
             case static_cast<uint8>(BountyHunter_Menu::GOSSIP_TOKENS):
                 if (amount > sBountyHunter->GetTokenMaxAmount())
@@ -266,7 +274,9 @@ private:
                     CloseGossipMenuFor(player);
                     return false;
                 }
-                sBountyHunter->AddGossipInfo(player->GetGUID(), {"", BountyPriceType::TOKENS, amount});
+                sBountyHunter->AddGossipInfo(player->GetGUID(), { "", BountyPriceType::TOKENS, amount });
+                break;
+            default:
                 break;
             }
             return true;
@@ -312,7 +322,7 @@ private:
                 return false;
             }
 
-            sBountyHunter->AddGossipInfo(player->GetGUID(), {temp, BountyPriceType::NONE, 0});
+            sBountyHunter->AddGossipInfo(player->GetGUID(), { temp, BountyPriceType::NONE, 0 });
             return true;
         }
 

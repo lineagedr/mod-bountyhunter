@@ -42,34 +42,31 @@ struct BountyGossipSelectText
 struct BountyGossipData
 {
     std::string bountyName;
-    BountyPriceType priceType {BountyPriceType::NONE};
-    uint32 priceAmount{0};
+    BountyPriceType priceType{ BountyPriceType::NONE };
+    uint32 priceAmount{ 0 };
 };
 
 struct BountyContainerData
 {
-    BountyPriceType type {BountyPriceType::NONE};
-    uint32 amount {0};
+    BountyPriceType type{ BountyPriceType::NONE };
+    uint32 amount{ 0 };
 };
-
-namespace
-{
-    typedef std::unordered_map<ObjectGuid, BountyGossipData> BountyGossipContainer;
-    typedef std::unordered_map<ObjectGuid, BountyContainerData>  BountyContainer;
-}
 
 class BountyHunter
 {
 public:
+    typedef std::unordered_map<ObjectGuid, BountyGossipData> BountyGossipContainer;
+    typedef std::unordered_map<ObjectGuid, BountyContainerData>  BountyContainer;
+
     static BountyHunter* instance();
     std::mutex m_Mu;
 
     void LoadConfig();
-    bool IsEnabled();
-    const uint32 GetTokenId() const;
-    const uint32 GetTokenMaxAmount() const;
-    const uint32 GetGoldMaxAmount() const;
-    const uint32 GetHonorMaxAmount() const;
+    bool IsEnabled() const;
+    uint32 GetTokenId() const;
+    uint32 GetTokenMaxAmount() const;
+    uint32 GetGoldMaxAmount() const;
+    uint32 GetHonorMaxAmount() const;
 
     bool IsReadyToSubmitBounty(ObjectGuid playerGuid);
     bool FindGossipInfoName(ObjectGuid playerGuid);
@@ -88,7 +85,7 @@ public:
     const std::string GetTokenName() const;
 
     BountyPriceType GetBountyPriceType(ObjectGuid playerGuid);
-    const uint32 GetBountyPriceAmount(ObjectGuid playerGuid);
+    uint32 GetBountyPriceAmount(ObjectGuid playerGuid);
 
     bool FindBounty(ObjectGuid playerGuid);
     void AddBounty(ObjectGuid playerGuid, BountyContainerData data);
@@ -105,7 +102,7 @@ public:
     void LoadBountiesFromDB();
 
 private:
-    bool m_IsEnabled;
+    bool   m_IsEnabled;
     uint32 m_TokenId;
     uint32 m_TokenMaxAmount;
     uint32 m_GoldMaxAmount;

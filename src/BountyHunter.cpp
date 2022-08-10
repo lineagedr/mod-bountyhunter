@@ -15,27 +15,27 @@ void BountyHunter::LoadConfig()
     m_HonorMaxAmount = sConfigMgr->GetOption<uint32>("BountyHunter.MaxHonorAmount", 75000);
 }
 
-bool BountyHunter::IsEnabled()
+bool BountyHunter::IsEnabled() const
 {
     return m_IsEnabled;
 }
 
-const uint32 BountyHunter::GetTokenId() const
+uint32 BountyHunter::GetTokenId() const
 {
     return m_TokenId;
 }
 
-const uint32 BountyHunter::GetTokenMaxAmount() const
+uint32 BountyHunter::GetTokenMaxAmount() const
 {
     return m_TokenMaxAmount;
 }
 
-const uint32 BountyHunter::GetGoldMaxAmount() const
+uint32 BountyHunter::GetGoldMaxAmount() const
 {
     return m_GoldMaxAmount;
 }
 
-const uint32 BountyHunter::GetHonorMaxAmount() const
+uint32 BountyHunter::GetHonorMaxAmount() const
 {
     return m_HonorMaxAmount;
 }
@@ -118,7 +118,7 @@ BountyPriceType BountyHunter::GetBountyPriceType(ObjectGuid playerGuid)
     return BountyPriceType::NONE;
 }
 
-const uint32 BountyHunter::GetBountyPriceAmount(ObjectGuid playerGuid)
+uint32 BountyHunter::GetBountyPriceAmount(ObjectGuid playerGuid)
 {
     std::lock_guard<std::mutex> lock(m_Mu);
     if (m_BountyContainer.find(playerGuid) != m_BountyContainer.end())
@@ -151,6 +151,8 @@ void BountyHunter::Announce(const Player* bounty, BountyAnnounceType type, const
         case BountyPriceType::GOLD: msg += "Gold"; break;
         case BountyPriceType::HONOR: msg += "Honor"; break;
         case BountyPriceType::TOKENS: msg += GetTokenLink(bounty->GetSession()); break;
+        default:
+            break;
         }
     };
 
@@ -240,7 +242,7 @@ void BountyHunter::LoadBountiesFromDB()
             uint8      priceType   = fields[1].GetUInt8();
             uint32     priceAmount = fields[2].GetUInt32();
 
-            sBountyHunter->AddBounty(guid, {static_cast<BountyPriceType>(priceType), priceAmount});
+            sBountyHunter->AddBounty(guid, { static_cast<BountyPriceType>(priceType), priceAmount });
             ++count;
 
         } while (bountyList->NextRow());
@@ -285,6 +287,7 @@ void BountyHunter::ListBounties(Player* player, Creature* creature)
             case BountyPriceType::GOLD: msg += "Gold"; break;
             case BountyPriceType::HONOR: msg += "Honor"; break;
             case BountyPriceType::TOKENS: msg += GetTokenLink(player->GetSession()); break;
+            default: break;
             }
             msg += " x";
             msg += std::to_string(bountyInfo.amount);
@@ -316,6 +319,8 @@ void BountyHunter::PayForBounty(Player* player)
         break;
     case BountyPriceType::TOKENS:
         player->DestroyItemCount(sBountyHunter->GetTokenId(), amount, true, false);
+        break;
+    default:
         break;
     }
 }
