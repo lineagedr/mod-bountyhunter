@@ -8,6 +8,7 @@
 
 #include "BountyHunter.h"
 #include "ScriptedGossip.h"
+#include "Player.h"
 
 class BountyHunter_Player : public PlayerScript
 {

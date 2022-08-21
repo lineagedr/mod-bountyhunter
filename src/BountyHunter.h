@@ -52,12 +52,12 @@ struct BountyContainerData
     uint32 amount{ 0 };
 };
 
+typedef std::unordered_map<ObjectGuid, BountyGossipData> BountyGossipContainer;
+typedef std::unordered_map<ObjectGuid, BountyContainerData>  BountyContainer;
+
 class BountyHunter
 {
 public:
-    typedef std::unordered_map<ObjectGuid, BountyGossipData> BountyGossipContainer;
-    typedef std::unordered_map<ObjectGuid, BountyContainerData>  BountyContainer;
-
     static BountyHunter* instance();
     std::mutex m_Mu;
 

@@ -1,4 +1,6 @@
 #include "BountyHunter.h"
+#include "Player.h"
+#include "ScriptedGossip.h"
 
 BountyHunter* BountyHunter::instance()
 {
@@ -233,14 +235,14 @@ const std::string BountyHunter::GetTokenName() const
 void BountyHunter::LoadBountiesFromDB()
 {
     uint32 count = 0;
-    if (QueryResult bountyList = CharacterDatabase.PQuery("SELECT * FROM bounties"))
+    if (QueryResult bountyList = CharacterDatabase.Query("SELECT * FROM bounties"))
     {
         do
         {
             Field*     fields      = bountyList->Fetch();
-            ObjectGuid guid        = ObjectGuid::Create<HighGuid::Player>(fields[0].GetUInt64());
-            uint8      priceType   = fields[1].GetUInt8();
-            uint32     priceAmount = fields[2].GetUInt32();
+            ObjectGuid guid        = ObjectGuid::Create<HighGuid::Player>(fields[0].Get<uint64>());
+            uint8      priceType   = fields[1].Get<uint8>();
+            uint32     priceAmount = fields[2].Get<uint32>();
 
             sBountyHunter->AddBounty(guid, { static_cast<BountyPriceType>(priceType), priceAmount });
             ++count;
@@ -254,9 +256,9 @@ void BountyHunter::SaveBountiesToDB()
 {
     if (!m_BountyContainer.empty())
     {
-        CharacterDatabase.PExecute("TRUNCATE TABLE bounties");
+        CharacterDatabase.Execute("TRUNCATE TABLE bounties");
         for (const auto& [guid, bounties] : m_BountyContainer)
-            CharacterDatabase.PExecute("INSERT INTO bounties (guid, priceType, priceAmount) VALUES ('%u', '%u', '%u')",
+            CharacterDatabase.Execute("INSERT INTO bounties (guid, priceType, priceAmount) VALUES ('%u', '%u', '%u')",
                 guid.GetCounter(), static_cast<uint8>(bounties.type), bounties.amount);
     }
 }
@@ -301,7 +303,7 @@ void BountyHunter::ListBounties(Player* player, Creature* creature)
 void BountyHunter::DeleteAllBounties(Player* player)
 {
     std::lock_guard<std::mutex> lock(m_Mu);
-    CharacterDatabase.PExecute("TRUNCATE TABLE bounties");
+    CharacterDatabase.Execute("TRUNCATE TABLE bounties");
     m_BountyContainer.clear();
     player->GetSession()->SendAreaTriggerMessage("|cff00ff00All bounties have been successfully deleted.|r");
 }
