@@ -3,7 +3,7 @@
 * https://github.com/lineagedr *
 *                              *
 *    Created on: 14/08/2021    *
-*    Updated on: 15/08/2021    *
+*    Updated on: 21/09/2022    *
 ********************************/
 
 #include "BountyHunter.h"
@@ -120,7 +120,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         if (!IsBountyEnabled(player))
             return true;
