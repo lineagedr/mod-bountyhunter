@@ -10,10 +10,10 @@ BountyHunter* BountyHunter::instance()
 
 void BountyHunter::LoadConfig()
 {
-    m_IsEnabled = sConfigMgr->GetOption<bool>("BountyHunter.Enable", false);
-    m_TokenId = sConfigMgr->GetOption<uint32>("BountyHunter.TokenId", 0);
+    m_IsEnabled      = sConfigMgr->GetOption<bool>("BountyHunter.Enable", false);
+    m_TokenId        = sConfigMgr->GetOption<uint32>("BountyHunter.TokenId", 0);
     m_TokenMaxAmount = sConfigMgr->GetOption<uint32>("BountyHunter.MaxTokenAmount", 10);
-    m_GoldMaxAmount = sConfigMgr->GetOption<uint32>("BountyHunter.MaxGoldAmount", 1000);
+    m_GoldMaxAmount  = sConfigMgr->GetOption<uint32>("BountyHunter.MaxGoldAmount", 1000);
     m_HonorMaxAmount = sConfigMgr->GetOption<uint32>("BountyHunter.MaxHonorAmount", 75000);
 }
 
@@ -42,100 +42,102 @@ uint32 BountyHunter::GetHonorMaxAmount() const
     return m_HonorMaxAmount;
 }
 
-bool BountyHunter::IsReadyToSubmitBounty(ObjectGuid playerGuid)
+bool BountyHunter::IsReadyToSubmitBounty(const ObjectGuid& playerGuid)
 {
-    std::lock_guard<std::mutex> lock(m_Mu);
     if (m_BountyGossipContainer.find(playerGuid) != m_BountyGossipContainer.end())
+    {
         if (!m_BountyGossipContainer[playerGuid].bountyName.empty() && m_BountyGossipContainer[playerGuid].priceAmount)
             return true;
+    }
 
     return false;
 }
 
-bool BountyHunter::FindGossipInfoName(ObjectGuid playerGuid)
+bool BountyHunter::FindGossipInfoName(const ObjectGuid& playerGuid)
 {
-    std::lock_guard<std::mutex> lock(m_Mu);
     if (m_BountyGossipContainer.find(playerGuid) != m_BountyGossipContainer.end())
+    {
         if (m_BountyGossipContainer[playerGuid].bountyName.c_str())
             return true;
+    }
 
     return false;
 }
 
-BountyPriceType BountyHunter::GetGossipPriceType(ObjectGuid playerGuid)
+BountyPriceType BountyHunter::GetGossipPriceType(const ObjectGuid& playerGuid)
 {
-    std::lock_guard<std::mutex> lock(m_Mu);
     if (m_BountyGossipContainer.find(playerGuid) != m_BountyGossipContainer.end())
         return m_BountyGossipContainer[playerGuid].priceType;
 
     return BountyPriceType::NONE;
 }
 
-uint32 BountyHunter::GetGossipInfoPriceAmount(ObjectGuid playerGuid)
+uint32 BountyHunter::GetGossipInfoPriceAmount(const ObjectGuid& playerGuid)
 {
-    std::lock_guard<std::mutex> lock(m_Mu);
     if (m_BountyGossipContainer.find(playerGuid) != m_BountyGossipContainer.end())
         return m_BountyGossipContainer[playerGuid].priceAmount;
 
     return 0;
 }
 
-void BountyHunter::AddGossipInfo(ObjectGuid playerGuid, BountyGossipData gossipData)
+void BountyHunter::AddGossipInfo(const ObjectGuid& playerGuid, BountyGossipData gossipData)
 {
-    std::lock_guard<std::mutex> lock(m_Mu);
     if (m_BountyGossipContainer.find(playerGuid) != m_BountyGossipContainer.end())
     {
         if (!gossipData.bountyName.empty())
+        {
             m_BountyGossipContainer[playerGuid].bountyName = gossipData.bountyName;
+        }
         if (gossipData.priceAmount)
+        {
             m_BountyGossipContainer[playerGuid].priceAmount = gossipData.priceAmount;
+        }
         if (gossipData.priceType != BountyPriceType::NONE)
+        {
             m_BountyGossipContainer[playerGuid].priceType = gossipData.priceType;
+        }
     }
     else
+    {
+        std::lock_guard<std::mutex> lock(m_Mu);
         m_BountyGossipContainer[playerGuid] = gossipData;
+    }
 }
 
-void BountyHunter::RemoveGossipInfo(ObjectGuid playerGuid)
+void BountyHunter::RemoveGossipInfo(const ObjectGuid& playerGuid)
 {
     std::lock_guard<std::mutex> lock(m_Mu);
     m_BountyGossipContainer.erase(playerGuid);
 }
 
-bool BountyHunter::FindBounty(ObjectGuid playerGuid)
+bool BountyHunter::FindBounty(const ObjectGuid& playerGuid)
 {
-    std::lock_guard<std::mutex> lock(m_Mu);
-    if (m_BountyContainer.find(playerGuid) != m_BountyContainer.end())
-        return true;
-
-    return false;
+    return m_BountyContainer.find(playerGuid) != m_BountyContainer.end();
 }
 
-BountyPriceType BountyHunter::GetBountyPriceType(ObjectGuid playerGuid)
+BountyPriceType BountyHunter::GetBountyPriceType(const ObjectGuid& playerGuid)
 {
-    std::lock_guard<std::mutex> lock(m_Mu);
     if (m_BountyContainer.find(playerGuid) != m_BountyContainer.end())
         return m_BountyContainer[playerGuid].type;
 
     return BountyPriceType::NONE;
 }
 
-uint32 BountyHunter::GetBountyPriceAmount(ObjectGuid playerGuid)
+uint32 BountyHunter::GetBountyPriceAmount(const ObjectGuid& playerGuid)
 {
-    std::lock_guard<std::mutex> lock(m_Mu);
     if (m_BountyContainer.find(playerGuid) != m_BountyContainer.end())
         return m_BountyContainer[playerGuid].amount;
 
     return 0;
 }
 
-void BountyHunter::AddBounty(ObjectGuid playerGuid, BountyContainerData data)
+void BountyHunter::AddBounty(const ObjectGuid& playerGuid, BountyContainerData data)
 {
     std::lock_guard<std::mutex> lock(m_Mu);
     m_BountyContainer[playerGuid] = data;
 }
 
-void BountyHunter::RemoveBounty(ObjectGuid playerGuid)
+void BountyHunter::RemoveBounty(const ObjectGuid& playerGuid)
 {
     std::lock_guard<std::mutex> lock(m_Mu);
     m_BountyContainer.erase(playerGuid);
@@ -150,11 +152,10 @@ void BountyHunter::Announce(const Player* bounty, BountyAnnounceType type, const
     {
         switch (m_BountyContainer[bounty->GetGUID()].type)
         {
-        case BountyPriceType::GOLD: msg += "Gold"; break;
-        case BountyPriceType::HONOR: msg += "Honor"; break;
+        case BountyPriceType::GOLD:   msg += "Gold"; break;
+        case BountyPriceType::HONOR:  msg += "Honor"; break;
         case BountyPriceType::TOKENS: msg += GetTokenLink(bounty->GetSession()); break;
-        default:
-            break;
+        default: break;
         }
     };
 
@@ -193,11 +194,14 @@ const std::string BountyHunter::GetTokenLink(const WorldSession* session) const
     const LocaleConstant loc_idx = session->GetSessionDbLocaleIndex();
     const ItemTemplate* temp = sObjectMgr->GetItemTemplate(sBountyHunter->GetTokenId());
 
-    if (!temp) return "[Unknown]";
+    if (!temp)
+        return "[Unknown]";
 
     std::string name = temp->Name1;
     if (ItemLocale const* il = sObjectMgr->GetItemLocale(temp->ItemId))
+    {
         ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
+    }
 
     std::ostringstream oss;
     oss << "|c" << std::hex << ItemQualityColors[temp->Quality]
@@ -218,10 +222,14 @@ const std::string BountyHunter::GetTokenIcon() const
     {
         dispInfo = sItemDisplayInfoStore.LookupEntry(temp->DisplayInfoID);
         if (dispInfo)
+        {
             ss << "/ICONS/" << dispInfo->inventoryIcon;
+        }
     }
     if (!dispInfo)
+    {
         ss << "/InventoryItems/WoWUnknownItem01";
+    }
     ss << ":" << 25 << ":" << 25 << "|t";
     return ss.str();
 }
@@ -258,17 +266,19 @@ void BountyHunter::SaveBountiesToDB()
     {
         CharacterDatabase.Execute("TRUNCATE TABLE bounties");
         for (const auto& [guid, bounties] : m_BountyContainer)
+        {
             CharacterDatabase.Execute("INSERT INTO bounties (guid, priceType, priceAmount) VALUES ('%u', '%u', '%u')",
                 guid.GetCounter(), static_cast<uint8>(bounties.type), bounties.amount);
+        }
     }
 }
 
 void BountyHunter::ListBounties(Player* player, Creature* creature)
 {
-    std::lock_guard<std::mutex> lock(m_Mu);
-
     if (m_BountyContainer.empty())
+    {
         AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "There are no active bounties at this moment.", GOSSIP_SENDER_MAIN, static_cast<uint8>(BountyHunter_Menu::GOSSIP_EXIT));
+    }
 
     uint32 count = 0;
     for (const auto& [guid, bountyInfo] : m_BountyContainer)
@@ -286,8 +296,8 @@ void BountyHunter::ListBounties(Player* player, Creature* creature)
             msg += " Reward: ";
             switch (bountyInfo.type)
             {
-            case BountyPriceType::GOLD: msg += "Gold"; break;
-            case BountyPriceType::HONOR: msg += "Honor"; break;
+            case BountyPriceType::GOLD:   msg += "Gold"; break;
+            case BountyPriceType::HONOR:  msg += "Honor"; break;
             case BountyPriceType::TOKENS: msg += GetTokenLink(player->GetSession()); break;
             default: break;
             }
@@ -314,7 +324,7 @@ void BountyHunter::PayForBounty(Player* player)
     switch (m_BountyGossipContainer[player->GetGUID()].priceType)
     {
     case BountyPriceType::GOLD:
-        player->ModifyMoney(-(amount * 10000));
+        player->ModifyMoney(-(amount * GOLD));
         break;
     case BountyPriceType::HONOR:
         player->ModifyHonorPoints(-amount);
@@ -329,6 +339,7 @@ void BountyHunter::PayForBounty(Player* player)
 
 void BountyHunter::SubmitBounty(Player* player)
 {
+    std::lock_guard<std::mutex> lock(m_Mu);
     if (Player* bounty = ObjectAccessor::FindPlayerByName(m_BountyGossipContainer[player->GetGUID()].bountyName, true))
     {
         m_BountyContainer[bounty->GetGUID()].type = m_BountyGossipContainer[player->GetGUID()].priceType;
@@ -337,10 +348,12 @@ void BountyHunter::SubmitBounty(Player* player)
         PayForBounty(player);
 
         player->GetSession()->SendAreaTriggerMessage("|cff00ff00You've placed a bounty on %s.|r", bounty->GetName().c_str());
-        Announce(bounty, BountyAnnounceType::TYPE_REGISTERED, "");
+        Announce(bounty, BountyAnnounceType::TYPE_REGISTERED);
     }
     else
+    {
         player->GetSession()->SendAreaTriggerMessage("|cffff0000The player is offline or doesn't exist.|r");
+    }
 
     RemoveGossipInfo(player->GetGUID());
 }

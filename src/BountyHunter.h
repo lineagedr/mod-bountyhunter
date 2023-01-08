@@ -9,29 +9,29 @@
 
 enum class BountyPriceType : uint8
 {
-    NONE = 0,
-    GOLD,
-    HONOR,
-    TOKENS
+    NONE   = 0,
+    GOLD   = 1,
+    HONOR  = 2,
+    TOKENS = 3
 };
 
 enum class BountyHunter_Menu : uint8
 {
-    GOSSIP_PLACE_BOUNTY = 0,
-    GOSSIP_LIST_BOUNTY,
-    GOSSIP_WIPE_BOUNTY,
-    GOSSIP_BOUNTY_NAME,
-    GOSSIP_GOLD,
-    GOSSIP_HONOR,
-    GOSSIP_TOKENS,
-    GOSSIP_SUBMIT_BOUNTY,
-    GOSSIP_EXIT,
+    GOSSIP_PLACE_BOUNTY  = 0,
+    GOSSIP_LIST_BOUNTY   = 1,
+    GOSSIP_WIPE_BOUNTY   = 2,
+    GOSSIP_BOUNTY_NAME   = 3,
+    GOSSIP_GOLD          = 4,
+    GOSSIP_HONOR         = 5,
+    GOSSIP_TOKENS        = 6,
+    GOSSIP_SUBMIT_BOUNTY = 7,
+    GOSSIP_EXIT          = 8
 };
 
 enum class BountyAnnounceType : uint8
 {
     TYPE_REGISTERED = 0,
-    TYPE_COLLECTED
+    TYPE_COLLECTED  = 1
 };
 
 struct BountyGossipSelectText
@@ -59,7 +59,6 @@ class BountyHunter
 {
 public:
     static BountyHunter* instance();
-    std::mutex m_Mu;
 
     void LoadConfig();
     bool IsEnabled() const;
@@ -68,13 +67,13 @@ public:
     uint32 GetGoldMaxAmount() const;
     uint32 GetHonorMaxAmount() const;
 
-    bool IsReadyToSubmitBounty(ObjectGuid playerGuid);
-    bool FindGossipInfoName(ObjectGuid playerGuid);
-    BountyPriceType GetGossipPriceType(ObjectGuid playerGuid);
-    uint32 GetGossipInfoPriceAmount(ObjectGuid playerGuid);
+    bool IsReadyToSubmitBounty(const ObjectGuid& playerGuid);
+    bool FindGossipInfoName(const ObjectGuid& playerGuid);
+    BountyPriceType GetGossipPriceType(const ObjectGuid& playerGuid);
+    uint32 GetGossipInfoPriceAmount(const ObjectGuid& playerGuid);
 
-    void AddGossipInfo(ObjectGuid playerGuid, BountyGossipData gossipData);
-    void RemoveGossipInfo(ObjectGuid playerGuid);
+    void AddGossipInfo(const ObjectGuid& playerGuid, BountyGossipData gossipData);
+    void RemoveGossipInfo(const ObjectGuid& playerGuid);
 
     void SubmitBounty(Player* player);
 
@@ -84,19 +83,19 @@ public:
     const std::string GetTokenIcon() const;
     const std::string GetTokenName() const;
 
-    BountyPriceType GetBountyPriceType(ObjectGuid playerGuid);
-    uint32 GetBountyPriceAmount(ObjectGuid playerGuid);
+    BountyPriceType GetBountyPriceType(const ObjectGuid& playerGuid);
+    uint32 GetBountyPriceAmount(const ObjectGuid& playerGuid);
 
-    bool FindBounty(ObjectGuid playerGuid);
-    void AddBounty(ObjectGuid playerGuid, BountyContainerData data);
-    void RemoveBounty(ObjectGuid playerGuid);
+    bool FindBounty(const ObjectGuid& playerGuid);
+    void AddBounty(const ObjectGuid& playerGuid, BountyContainerData data);
+    void RemoveBounty(const ObjectGuid& playerGuid);
 
     void ListBounties(Player* player, Creature* creature);
     void DeleteAllBounties(Player* player);
 
     void PayForBounty(Player* player);
 
-    void Announce(const Player* bounty, BountyAnnounceType type, const std::string_view killerName);
+    void Announce(const Player* bounty, BountyAnnounceType type, const std::string_view killerName = "");
     void SaveBountiesToDB();
 
     void LoadBountiesFromDB();
@@ -108,7 +107,9 @@ private:
     uint32 m_GoldMaxAmount;
     uint32 m_HonorMaxAmount;
 
-    BountyContainer m_BountyContainer;
+    std::mutex m_Mu;
+
+    BountyContainer       m_BountyContainer;
     BountyGossipContainer m_BountyGossipContainer;
 };
 
